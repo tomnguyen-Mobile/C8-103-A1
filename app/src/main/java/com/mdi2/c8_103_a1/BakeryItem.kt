@@ -1,6 +1,4 @@
-package com.mdi2.c8_103_a1.ui.theme
-
-import androidx.compose.runtime.Composable
+package com.mdi2.c8_103_a1
 
 // CHALLENGE 1
 data class BakeryItem(
