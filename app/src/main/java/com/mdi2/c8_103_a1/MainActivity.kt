@@ -6,11 +6,16 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -24,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.mdi2.c8_103_a1.ui.theme.C8103A1Theme
@@ -59,23 +65,7 @@ fun BakeryRevenueScreen(){
     var bestSellingItem by remember { mutableStateOf(value= "") }
     var errorMessage by remember { mutableStateOf(value= "") }
 
-    fun onCalculateRevenue(){
-        val cookiesP = cookiesPrice.toDoubleOrNull()
-        val cookiesS = cookiesSold.toDoubleOrNull()
-        val muffinP = muffinPrice.toDoubleOrNull()
-        val muffinsS = muffinsSold.toDoubleOrNull()
-        val cakesP = cakePrice.toDoubleOrNull()
-        val cakesS = cakesSold.toDoubleOrNull()
 
-        if( cookiesS == null || cookiesP == null || // ON CALCULATE REVENUE
-            muffinP == null || muffinsS == null ||
-            cakesP == null || cakesS == null
-        ){
-            errorMessage = "Please enter valid numeric values"
-        } else{
-            errorMessage = ""
-        } // end of fun - ON CALCULATE REVENUE
-    }
 
     Column(modifier = Modifier //COLUMN 1
                         .fillMaxSize()
@@ -149,16 +139,96 @@ fun BakeryRevenueScreen(){
 
         // challenge 1 Assignment 2
         Button( // CALCULATE REVENUE
-            onClick = { onCalculateRevenue() },
+            onClick = {
+                val cookieP = cookiesPrice.toDoubleOrNull()
+                val cookiesS = cookiesSold.toDoubleOrNull()
+                val muffinP = muffinPrice.toDoubleOrNull()
+                val muffinsS = muffinsSold.toDoubleOrNull()
+                val cakeP = cakePrice.toDoubleOrNull()
+                val cakesS = cakesSold.toDoubleOrNull()
+
+                if ( // REVENUE
+                    cookiesS == null || cookieP == null ||
+                    muffinsS == null || muffinP == null ||
+                    cakesS == null || cakeP == null
+                ){
+                    errorMessage = "Please enter valid numeric values"
+                } else {
+                    errorMessage = ""
+
+                    bakeryItems.clear()
+                    bakeryItems.add(BakeryItem(name= "Cookies", sold= cookiesS, price= cookieP))
+                    bakeryItems.add(BakeryItem("Muffins", muffinsS, muffinP))
+                    bakeryItems.add(BakeryItem("Cakes", cakesS, cakeP))
+
+                    totalRevenue = bakeryItems.sumOf{ it.revenue() }
+
+                    val topItem = bakeryItems.maxByOrNull { it.revenue() }
+
+                    bestSellingItem = topItem?.name ?: ""
+                }// end of if statement for - REVENUE
+            }, // end of onclick
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text(text = "Calculate Revenue")
+            Text("Calculate Revenue")
         } // end of button  - CALCULATE REVENUE
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        if(errorMessage.isNotEmpty()){ // ERROR MESSAGE
+            Text(
+                text = errorMessage,
+                color = Color.Red
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+        }// end of it statement for - ERROR MESSAGE
+
+        Card( // CARD 1
+            modifier = Modifier.fillMaxWidth(),
+            elevation = CardDefaults.cardElevation(4.dp), // give it a shadow on the back to make it look raised
+        ){
+            Column( // CARD COLUMN 1
+                modifier = Modifier.padding(16.dp)
+            ){
+
+                Text( // class 02 - challenge 4
+                    text = "Daily Revenue Report",
+                    style = MaterialTheme.typography.titleLarge
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+
+                if(bakeryItems.isEmpty()){ Text("No report available yet.") } // No report
+                else{
+                    LazyColumn(modifier = Modifier.fillMaxWidth()){ // DISPLAY ITEMS
+                        items( bakeryItems){ item ->
+                            Text(text="${item.name}: $currentSymbol${"%.2f".format(item.revenue())}")
+                            Spacer(modifier = Modifier.height(12.dp))
+                        }
+                    }// end of lazycolumn -DISPLAY ITEMS
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text(
+                        text = "Best revenue item: $bestSellingItem",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text="Total revenue: $currentSymbol${"%.2f".format(totalRevenue)}",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }// end of else
+            }// end of column for - CARD COLUMN 1
+        } // end of card - CARD 1
+
 
     }// end of - COLUMN 1
 
 
 }
+
+// Lazy Column - generate a scrollable list that is limited in how many items are shown
+// Lazy Row
+// Lazy grids
+// helps the performance of the system by load by loading a little at a time instead of everything.
 
 @Preview(showBackground = true)
 @Composable
