@@ -137,12 +137,12 @@ fun BakeryRevenueScreen(){
         // challenge 1 Assignment 2
         Button( // CALCULATE REVENUE
             onClick = {
-                fun validationForUser(inputFromUser: String): Boolean {
+                fun validationForUser(inputFromUser: String): Boolean { // let us know that something is wrong with the input
                     val number: Double? = inputFromUser.toDoubleOrNull()
                     return inputFromUser.isBlank() || number == null || number < 0  // check for empty field || number is null || not negative number
                 }
 
-                fun invalidInput(input: String): String {
+                fun invalidInput(input: String): String { // returns what was wrong with the input
                     if (input.isBlank()){ return "empty"}
                     if (input.toDoubleOrNull() == null){ return "not a numeric value"}
                     if (input.toDouble() < 0){ return "a negative number"}
@@ -168,8 +168,9 @@ fun BakeryRevenueScreen(){
                         else -> "null"
                     }
                     errorMessage = "Invalid input: $validationError"
-                    return@Button // Don't need else if using return@Button
-                } //else {
+                    bakeryItems.clear() // reset the Daily Revenue Report Card - CARD 1
+//                    return@Button // Don't need else if using return@Button
+                } else {
                     errorMessage = ""
 
                     val cookieP: Double = cookiesPrice.toDouble()
@@ -189,7 +190,7 @@ fun BakeryRevenueScreen(){
                     val topItem = bakeryItems.maxByOrNull { it.revenue() }
 
                     bestSellingItem = topItem?.name ?: ""
-                //}// end of if statement for - REVENUE
+                }// end of if statement for - REVENUE
             }, // end of onclick
             modifier = Modifier.fillMaxWidth()
         ) {
