@@ -140,21 +140,47 @@ fun BakeryRevenueScreen(){
         // challenge 1 Assignment 2
         Button( // CALCULATE REVENUE
             onClick = {
-                val cookieP = cookiesPrice.toDoubleOrNull()
-                val cookiesS = cookiesSold.toDoubleOrNull()
-                val muffinP = muffinPrice.toDoubleOrNull()
-                val muffinsS = muffinsSold.toDoubleOrNull()
-                val cakeP = cakePrice.toDoubleOrNull()
-                val cakesS = cakesSold.toDoubleOrNull()
+                fun validationForUser(inputFromUser: String): Boolean {
+                    val number: Double? = inputFromUser.toDoubleOrNull()
+                    return inputFromUser.isBlank() || number == null || number < 0  // check for empty field || number is null || not negative number
+                }
+
+                fun invalidInput(input: String): String {
+                    if (input.isBlank()){ return "empty"}
+                    if (input.toDoubleOrNull() == null){ return "not a numeric value"}
+                    if (input.toDouble() < 0){ return "a negative number"}
+                    return "null"
+                }
+
 
                 if ( // REVENUE
-                    cookiesS == null || cookieP == null ||
-                    muffinsS == null || muffinP == null ||
-                    cakesS == null || cakeP == null
+                    validationForUser(cookiesPrice) ||
+                    validationForUser(cookiesSold) ||
+                    validationForUser(muffinPrice) ||
+                    validationForUser(muffinsSold) ||
+                    validationForUser(cakePrice) ||
+                    validationForUser(cakesSold)
                 ){
-                    errorMessage = "Please enter valid numeric values"
-                } else {
+                    val validationError: String = when {
+                        validationForUser(cookiesPrice) -> "Cookie price field is ${invalidInput(cookiesPrice)}"
+                        validationForUser(cookiesSold) -> "Cookies sold field is ${invalidInput(cookiesSold)}"
+                        validationForUser(muffinPrice) -> " Muffin price field is ${invalidInput(muffinPrice)}"
+                        validationForUser(muffinsSold) -> " Muffins sold field is ${invalidInput(muffinsSold)}"
+                        validationForUser(cakePrice) -> " Cake price field is ${invalidInput(cakePrice)}"
+                        validationForUser(cakesSold) -> " Cakes sold field is ${invalidInput(cakesSold)}"
+                        else -> "null"
+                    }
+                    errorMessage = "Invalid input: $validationError"
+                    return@Button // Don't need else if using return@Button
+                } //else {
                     errorMessage = ""
+
+                    val cookieP: Double = cookiesPrice.toDouble()
+                    val cookiesS: Double = cookiesSold.toDouble()
+                    val muffinP: Double = muffinPrice.toDouble()
+                    val muffinsS: Double = muffinsSold.toDouble()
+                    val cakeP: Double = cakePrice.toDouble()
+                    val cakesS: Double = cakesSold.toDouble()
 
                     bakeryItems.clear()
                     bakeryItems.add(BakeryItem(name= "Cookies", sold= cookiesS, price= cookieP))
@@ -166,7 +192,7 @@ fun BakeryRevenueScreen(){
                     val topItem = bakeryItems.maxByOrNull { it.revenue() }
 
                     bestSellingItem = topItem?.name ?: ""
-                }// end of if statement for - REVENUE
+                //}// end of if statement for - REVENUE
             }, // end of onclick
             modifier = Modifier.fillMaxWidth()
         ) {
